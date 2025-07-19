@@ -6,19 +6,20 @@ from common import bosl, sled, belt, post, T, T2, T12, e, ee, gears, gear_teeth_
 
 d = bosl.cylinder(h=sled.height + belt.height12, r=post.rad).down(sled.height)
 
-def rack_teeth_ceiling_bbox(length):
-    return bosl.cuboid([length, belt.width, T+ee]).down(T+e)
 
 def rack_teeth_ceiling(length):
     # Add gears in ceiling
-    return c.red(gears.rack(
+    rack = gears.rack(
         pitch=belt.pitch,
         teeth=length / belt.pitch,
         thickness=belt.width,
         backing=belt.height - gear_teeth_height,  # total height of rack assy is now belt.height
         orient=bosl.DOWN,
         anchor=bosl.BOTTOM
-    ))  # rack teeth point down, rack back is at XY plane facing up
+    )  # rack teeth point down, rack back is at XY plane facing up
+    rack._bbox = bosl.cuboid([length, belt.width, belt.height+ee]).down(T+e)  # pyright: ignore[reportAttributeAccessIssue]
+    return c.red(rack)
+
 
 for i in range(post.N):
     _alpha = i * 360 / post.N
@@ -30,9 +31,10 @@ for i in range(post.N):
 
     # Add gears in ceiling
     _rack_translate = post.rad - post.ring_thickness12, 0, belt.height/2 - e
-    d -= rack_teeth_ceiling_bbox(post.ring_thickness).translate(_rack_translate).rotateZ(_alpha)
-    d += rack_teeth_ceiling(post.ring_thickness).translate(_rack_translate).rotateZ(_alpha)
-    
+    _rack = rack_teeth_ceiling(post.ring_thickness).translate(_rack_translate).rotateZ(_alpha)
+    d -= Bbox.to_cube(_rack)  # first make space for the rack by subtracting the bbox
+    d += _rack
+
 
 # create hole for internal disk
 d -= bosl.cylinder(h=sled.height + belt.height12+ee, r=post.rad_int + T12).down(sled.height+e)
@@ -43,8 +45,9 @@ internal_disk -= sled_cutout.scale(post.rad_int/sled.length, 1, 1).right(post.ra
 
 # Add gears in ceiling
 _rack_translate = post.rad_int12, 0, belt.height/2 - e
-internal_disk -= rack_teeth_ceiling_bbox(post.rad_int).translate(_rack_translate)
-internal_disk += rack_teeth_ceiling(post.rad_int).translate(_rack_translate).left(1)  # left 1 HACK
+_rack = rack_teeth_ceiling(post.rad_int).translate(_rack_translate)
+internal_disk -= Bbox.to_cube(_rack)
+internal_disk += _rack.left(1)  # left 1 HACK
 
 # Cutout for post holder / stand rod
 # T/2 spacing around the hole, since this internal disk should somehow freely spin around the rod
@@ -67,7 +70,6 @@ d += internal_disk
 # as this would cause the worm to block and thusly act as a static rack
 
 d_sled = c.blue(d_sled)
-# d += d_sled.right(post.rad + sled.length12)
 d += d_sled.right(Max(d).x + Max(d_sled).x)
 
 # d = d * XZ

@@ -21,11 +21,12 @@ d -= sled_cutout
 d += bosl.cuboid([sled.length, belt.width+T2, T]).up(T/2) # belt guide ridge
 # d = bosl.cuboid([sled.length, belt.width+T2, T]).up(T/2) # belt guide ridge
 
-d -= bosl.cuboid([sled.length+e, belt.width + belt.margin2, belt.height + belt.margin2]) # belt cutout
+belt_cutout = bosl.cuboid([sled.length+e, belt.width + belt.margin2, belt.height + belt.margin2]) # belt cutout
+d -= belt_cutout
 
-_beltcutout = bosl.cuboid([sled.belt_cutout_length+e, belt.width + belt.margin2, T+e]).down(T/2) # belt drive gear cutout
-d -= _beltcutout.left((sled.length - sled.belt_cutout_length) / 2)
-d -= _beltcutout.right((sled.length - sled.belt_cutout_length) / 2)
+_beltgearcutout = bosl.cuboid([sled.belt_cutout_length+e, belt.width + belt.margin2, T+e]).down(T/2) # belt drive gear cutout
+d -= _beltgearcutout.left((sled.length - sled.belt_cutout_length) / 2)
+d -= _beltgearcutout.right((sled.length - sled.belt_cutout_length) / 2)
 
 # TODO: add teeth to ceiling of sled (the part underneath the belt), because the car needs to be able to crawl into the sled when coming from a post.
 # UPDATE: That might no longer be required, if I decide that the car will be fully symmetric and thusly have a drive sprocket on either side.

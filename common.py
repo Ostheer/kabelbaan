@@ -1,7 +1,7 @@
 from solid2 import set_global_fn
 import solid2.extensions.bosl2 as bosl
 from solid2.extensions.bosl2 import gears  # noqa: F401
-from helpers import MultAttrNamespace, c, save_as_scad  # noqa: F401
+from helpers import MultAttrNamespace, c, c1, c2, c3, c4, c5, save_as_scad  # noqa: F401
 from solidbox import Bbox, Size, Mid, Max, Min  # noqa: F401
 
 
@@ -45,10 +45,13 @@ class post(MultAttrNamespace):
         rad=5
 
 class car(MultAttrNamespace):
-    # Position relative to center (along belt direction) of car
-    # There is one drive gear, but it may be either on the front
-    # or on the back of the sled depending on car orientation.
-    drivegear_pos = sled.length12 + sled.belt_cutout_length12
+    class gear(MultAttrNamespace):
+        shaft_diam = T*1.5
+        width = belt.width * 2/3
+        # Position relative to center (along belt direction) of car
+        # There is one drive gear, but it may be either on the front
+        # or on the back of the sled depending on car orientation.
+        pos = sled.length12 - sled.belt_cutout_length12
 
 
 set_global_fn(60)

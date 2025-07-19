@@ -15,6 +15,9 @@ class MultAttrNamespaceMeta(type):
         addthem = {}
         orig_attrs = {}
         for attr, value in cls.__dict__.items():
+            if attr.startswith("__") and attr.endswith("__"):
+                continue
+            
             if isinstance(value, (int, float)):
                 orig_attrs[attr] = value
                 addthem[f"{attr}2"] = value * 2
@@ -68,6 +71,7 @@ class _c:
     def blue(self):
         return bosl.hsv(h=240, s=0.33, v=1, a=self.alpha)
 c = _c()
+c1 = c
 c2 = _c(alpha=.75)
 c3 = _c(alpha=.5)
 c4 = _c(alpha=.25)
